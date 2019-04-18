@@ -1,13 +1,14 @@
-import React, { Component } from 'react';
-import './Header.css';
+import React, { Component } from "react";
+import "./Header.css";
+import axios from "axios";
 
 export default class Header extends Component {
   constructor() {
     super();
     this.state = {
-      username: '',
-      password: '',
-      isAdmin: false,
+      username: "",
+      password: "",
+      isAdmin: false
     };
     this.register = this.register.bind(this);
     this.login = this.login.bind(this);
@@ -32,7 +33,10 @@ export default class Header extends Component {
   }
 
   register() {
-    // axios POST to /auth/register here
+    const { username, password, isAdmin } = this.state;
+    axios
+      .post("/auth/register", { username, password, isAdmin })
+      .then(this.setState({ username: "", password: "", isAdmin: false }));
   }
 
   logout() {
@@ -67,7 +71,12 @@ export default class Header extends Component {
               onChange={e => this.handlePasswordInput(e.target.value)}
             />
             <div className="adminCheck">
-              <input type="checkbox" id="adminCheckbox" onChange={() => this.toggleAdmin()} /> <span> Admin </span>
+              <input
+                type="checkbox"
+                id="adminCheckbox"
+                onChange={() => this.toggleAdmin()}
+              />{" "}
+              <span> Admin </span>
             </div>
             <button onClick={this.login}>Log In</button>
             <button onClick={this.register} id="reg">
@@ -79,4 +88,3 @@ export default class Header extends Component {
     );
   }
 }
-
