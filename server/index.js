@@ -5,8 +5,10 @@ const app = express();
 const massive = require("massive");
 //require express-session to create sessions and sessions store
 const session = require("express-session");
-//require controllers/authController to use methods that dictate how to handle a request and response
+//require controllers/authController and controllers/treasureController to use methods that dictate how to handle a request and response
 const ac = require("./controllers/authController");
+const tc = require("./controllers/treasureController");
+const auth = require("./middleware/authMiddleware");
 const PORT = 4000;
 //
 const { CONNECTION_STRING, SESSION_SECRET } = process.env;
@@ -25,10 +27,24 @@ app.use(
     secret: SESSION_SECRET
   })
 );
-//Endpoints
+//Endpoints- Login/Logout functions
+//endpoint for registering user
 app.post("/auth/register", ac.register);
-app.post("/auth/register", (req, res) => {
-  res.status(200).json(req.session.user);
-});
+//endpoint for logging in
+app.post("/auth/login", ac.login);
+//endpoint to get user info and logout
+app.get("/auth/logout", ac.logout);
+
+//Endpoints- Get dragon treasures
+app.get("/api/treasure/dragon", tc.dragonTreasure);
+app.get("/api/treasure/user", auth.usersOnly, tc.getUserTreasure);
+app.post("/api/treasure/user", auth.usersOnly, tc.addUserTreasure);
+app.get(
+  "/api/treasure/all",
+  auth.usersOnly,
+  auth.adminsOnly,
+  tc.getAllTreasure
+);
+
 //Make sure server is listening
 app.listen(PORT, () => console.log(`Listening on Port ${PORT}`));
